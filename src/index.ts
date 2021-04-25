@@ -1,21 +1,26 @@
-import "reflect-metadata";
-import {createConnection} from "typeorm";
-import {User} from "./entity/User";
+import { DEFAULT_ENPOINT } from './const';
+import 'reflect-metadata';
+import { createConnection } from 'typeorm';
+import express from 'express';
+import morgan from 'morgan';
+import router from './api';
 
-createConnection().then(async connection => {
+const port = process.env.PORT || 3000;
 
-    console.log("Inserting a new user into the database...");
-    const user = new User();
-    user.firstName = "Timber";
-    user.lastName = "Saw";
-    user.age = 25;
-    await connection.manager.save(user);
-    console.log("Saved a new user with id: " + user.id);
+createConnection()
+  .then(() => {
+    const app = express();
 
-    console.log("Loading users from the database...");
-    const users = await connection.manager.find(User);
-    console.log("Loaded users: ", users);
+    app.use(express.json());
+    app.use(morgan('dev'));
 
-    console.log("Here you can setup and run express/koa/any other framework.");
+    app.use(DEFAULT_ENPOINT, router);
 
-}).catch(error => console.log(error));
+    // make sure to do nothing if the /api route isnt targeted
+    app.use('', (req, res, next) => {
+      // do nothing
+    });
+
+    app.listen(port, () => console.log('Listening on port', port));
+  })
+  .catch((error) => console.log(error));
