@@ -1,17 +1,17 @@
 import { Dreamer } from './Dreamer';
 import {
   BaseEntity,
-  BeforeInsert,
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
 @Entity('dreams')
 export class Dream extends BaseEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ManyToOne((type) => Dreamer, (author) => author.dreams)
@@ -23,19 +23,9 @@ export class Dream extends BaseEntity {
   @Column({ type: 'varchar', length: '750' })
   content: string;
 
-  @Column()
+  @CreateDateColumn()
   dateCreated: Date;
 
-  @Column({ type: 'date', nullable: true, default: null })
+  @UpdateDateColumn()
   dateEdited: Date;
-
-  @BeforeInsert()
-  addValues() {
-    this.id = uuidv4();
-  }
-
-  @BeforeInsert()
-  addDate() {
-    this.dateCreated = new Date();
-  }
 }

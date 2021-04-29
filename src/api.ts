@@ -1,13 +1,10 @@
-import { DREAMS_ENDPOINT, DREAMER_ENDPOINT } from './const';
+import { ErrorWithStatus, removeEmptyOrNull } from './utils';
+import { DREAMS_ENDPOINT, DREAMER_ENDPOINT } from './static/const';
 import express from 'express';
 import dreamsRouter from './routes/dreams';
 import dreamerRouter from './routes/dreamer';
 
 const router = express.Router();
-
-interface ErrorWithStaus extends Error {
-  status?: number;
-}
 
 // CORS ERROR HANDLING
 router.use((req, res, next) => {
@@ -28,7 +25,7 @@ router.use(DREAMER_ENDPOINT, dreamerRouter);
 
 // Handles request if no route was found
 router.use((req, res, next) => {
-  const err = new Error('This endpoint does not exist.') as ErrorWithStaus;
+  const err = new Error('This endpoint does not exist.') as ErrorWithStatus;
   err.status = 404;
 
   next(err);
@@ -37,17 +34,19 @@ router.use((req, res, next) => {
 // Handles all error request that get passed
 router.use(
   (
-    err: ErrorWithStaus,
+    err: ErrorWithStatus,
     req: express.Request,
     res: express.Response,
     next: () => void
   ) => {
-    res.status(err.status || 500);
-    res.json({
-      error: {
-        message: err.message,
-      },
-    });
+    res.status(err.status || 500).json(
+      removeEmptyOrNull({
+        error: {
+          message: err.message,
+          messages: err.messages,
+        },
+      })
+    );
   }
 );
 

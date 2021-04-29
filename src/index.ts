@@ -1,11 +1,11 @@
-import { DEFAULT_ENPOINT } from './const';
+import { DEFAULT_ENPOINT } from './static/const';
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import express from 'express';
 import morgan from 'morgan';
 import router from './api';
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 createConnection()
   .then(() => {

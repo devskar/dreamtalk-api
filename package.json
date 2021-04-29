@@ -18,8 +18,7 @@
       "morgan": "^1.10.0",
       "pg": "^8.6.0",
       "reflect-metadata": "^0.1.13",
-      "typeorm": "0.2.32",
-      "uuid": "^8.3.2"
+      "typeorm": "0.2.32"
    },
    "scripts": {
       "start": "nodemon --exec ts-node src/index.ts"

@@ -2,45 +2,37 @@ import { Dream } from './Dream';
 import {
   Entity,
   Column,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   BeforeInsert,
   BaseEntity,
   OneToMany,
+  CreateDateColumn,
 } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
 @Entity('dreamer')
 export class Dreamer extends BaseEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'varchar', length: 25 })
   nickname: string;
 
-  @Column({ type: 'varchar', length: 15 })
+  @Column({ type: 'varchar', length: 15, unique: true })
   username: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
 
   @Column({ type: 'text' })
   password: string;
 
-  @Column()
+  @CreateDateColumn()
   dateJoined: Date;
 
-  @OneToMany((type) => Dream, (dream) => dream.author)
+  @OneToMany(() => Dream, (dream) => dream.author, {
+    onDelete: 'CASCADE',
+  })
   dreams: Dream[];
-
-  @BeforeInsert()
-  addId() {
-    this.id = uuidv4();
-  }
-
-  @BeforeInsert()
-  addDate() {
-    this.dateJoined = new Date();
-  }
 
   @BeforeInsert()
   addNickname() {

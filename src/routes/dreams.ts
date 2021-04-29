@@ -1,8 +1,6 @@
 import { Dreamer } from './../entity/Dreamer';
 import { Dream } from './../entity/Dream';
 import express from 'express';
-import { JoinColumn } from 'typeorm';
-
 const router = express.Router();
 
 router.get('/', (req, res, next) => {
