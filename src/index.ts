@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import express from 'express';
 import morgan from 'morgan';
+import helmet from 'helmet';
 import router from './api';
 
 const port = process.env.PORT || 3001;
@@ -13,6 +14,8 @@ createConnection()
 
     app.use(express.json());
     app.use(morgan('dev'));
+
+    app.use(helmet());
 
     app.use(DEFAULT_ENPOINT, router);
 

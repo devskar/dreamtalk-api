@@ -7,4 +7,9 @@ export const DREAMER_ENDPOINT = '/dreamer';
 export const RATE_LIMIT_WINDOW = 60 * 60 * 1000;
 export const RATE_LIMIT_MAX = 10;
 
+// JWT
+export const JWTCOOKIENAME = 'sessiontoken';
+export const JWTSECRET = 'BgJ133eBIXn8ocqh14T1xB8Vmt7nYZ2Uh8mndn06RBBhlamJmZ';
+export const JWTMAXTIME = '15m';
+
 export const __prod__ = process.env.NODE_ENV === 'production';

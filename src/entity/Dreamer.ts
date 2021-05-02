@@ -9,6 +9,12 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
+export enum DreamerPermissionLevel {
+  User,
+  Staff,
+  Admin,
+}
+
 @Entity('dreamer')
 export class Dreamer extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -26,6 +32,9 @@ export class Dreamer extends BaseEntity {
   @Column({ type: 'text' })
   password: string;
 
+  @Column({ type: 'text' })
+  permissionLevel: DreamerPermissionLevel;
+
   @CreateDateColumn()
   dateJoined: Date;
 
@@ -37,5 +46,11 @@ export class Dreamer extends BaseEntity {
   @BeforeInsert()
   addNickname() {
     if (!this.nickname) this.nickname = this.username;
+  }
+
+  @BeforeInsert()
+  setPermissionLevel() {
+    if (!this.permissionLevel)
+      this.permissionLevel = DreamerPermissionLevel.User;
   }
 }
