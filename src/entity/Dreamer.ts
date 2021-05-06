@@ -1,4 +1,4 @@
-import { Dream } from './Dream';
+import Dream from './Dream';
 import {
   Entity,
   Column,
@@ -16,7 +16,7 @@ export enum DreamerPermissionLevel {
 }
 
 @Entity('dreamer')
-export class Dreamer extends BaseEntity {
+class Dreamer extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -54,3 +54,5 @@ export class Dreamer extends BaseEntity {
       this.permissionLevel = DreamerPermissionLevel.User;
   }
 }
+
+export default Dreamer;

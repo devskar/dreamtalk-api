@@ -13,7 +13,7 @@ import {
   ErrorWithStatus,
   sendJoiErrorResponse,
 } from '../utils/utils';
-import { Dreamer } from '../entity/Dreamer';
+import Dreamer from '../entity/Dreamer';
 import express from 'express';
 
 export const signup = async (

@@ -1,4 +1,4 @@
-import { Dreamer } from './Dreamer';
+import Dreamer from './Dreamer';
 import {
   BaseEntity,
   Column,
@@ -10,11 +10,11 @@ import {
 } from 'typeorm';
 
 @Entity('dreams')
-export class Dream extends BaseEntity {
+class Dream extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne((type) => Dreamer, (author) => author.dreams)
+  @ManyToOne(() => Dreamer, (author) => author.dreams)
   author: Dreamer;
 
   @Column({ type: 'varchar', length: '75' })
@@ -29,3 +29,5 @@ export class Dream extends BaseEntity {
   @UpdateDateColumn()
   dateEdited: Date;
 }
+
+export default Dream;
