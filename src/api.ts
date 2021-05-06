@@ -1,19 +1,25 @@
-import { ErrorWithStatus, removeEmptyOrNull } from './utils/utils';
 import { DREAMS_ENDPOINT, DREAMER_ENDPOINT } from './static/const';
 import express from 'express';
 import dreamsRouter from './routes/dreams';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import dreamerRouter from './routes/dreamer';
 import {
   errorHandler,
   noEndpointFoundHandler,
-  corsHandler,
   jwtHandler,
 } from './utils/handler';
 
 const router = express.Router();
 
-// CORS ERROR HANDLING
-router.use(corsHandler);
+router.use(cookieParser());
+router.use(
+  cors({
+    origin: true,
+    credentials: true,
+    optionsSuccessStatus: 200,
+  })
+);
 
 // JWT HANDLING
 router.use(jwtHandler);

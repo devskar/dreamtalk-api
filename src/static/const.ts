@@ -11,5 +11,7 @@ export const RATE_LIMIT_MAX = 10;
 export const JWTCOOKIENAME = 'sessiontoken';
 export const JWTSECRET = 'BgJ133eBIXn8ocqh14T1xB8Vmt7nYZ2Uh8mndn06RBBhlamJmZ';
 export const JWTMAXTIME = '15m';
+export const JWTMAXTIMEMINUTES = 15;
 
-export const __prod__ = process.env.NODE_ENV === 'production';
+export const COOKIEDOMAINNAME = 'dreamtalk.abc';
+export const COOKIEPATH = '/';

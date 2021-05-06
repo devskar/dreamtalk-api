@@ -1,6 +1,18 @@
+import {
+  sendWrongCredentialsResponse,
+  setJWTHeader,
+  resetJWTHeader,
+} from './../utils/utils';
 import bcrypt from 'bcryptjs';
-import { DREAMER_SIGNUP_SCHEMA } from './../static/schemas';
-import { createJWT, ErrorWithStatus } from '../utils/utils';
+import {
+  DREAMER_SIGNUP_SCHEMA,
+  DREAMER_LOGIN_SCHEMA,
+} from './../static/schemas';
+import {
+  createJWT,
+  ErrorWithStatus,
+  sendJoiErrorResponse,
+} from '../utils/utils';
 import { Dreamer } from '../entity/Dreamer';
 import express from 'express';
 
@@ -15,21 +27,12 @@ export const signup = async (
   });
 
   // IF ANYTHING IS INVALID
-  if (error) {
-    const messages = error.details.map((x) => x.message);
-
-    const err = new Error() as ErrorWithStatus;
-    err.status = 400;
-    err.messages = messages;
-
-    return next(err);
-  }
+  if (error) return sendJoiErrorResponse(error, next);
 
   // GETTING THE VALID DATA
   const { username, email, password } = value;
 
   // CHECK IF USERNAME OR EMAIL IS ALREADY USED
-
   const used = [];
 
   if (await Dreamer.findOne({ username: username })) {
@@ -61,7 +64,7 @@ export const signup = async (
     .then((savedDreamer) => {
       const token = createJWT(savedDreamer.id, savedDreamer.permissionLevel);
 
-      res.setHeader('Set-Cookie', `sessiontoken=${token}; HttpOnly`);
+      setJWTHeader(res, token);
 
       return res.status(200).json({
         message: 'A new dreamer has been created.',
@@ -72,6 +75,58 @@ export const signup = async (
       res.status(400).json({ message: 'Something went wrong.' });
     });
 };
+
+export const login = async (
+  req: express.Request,
+  res: express.Response,
+  next: (err?: ErrorWithStatus | Error) => void
+) => {
+  const { error, value } = DREAMER_LOGIN_SCHEMA.validate(req.body, {
+    abortEarly: false,
+  });
+
+  if (error) return sendJoiErrorResponse(error, next);
+
+  const { password, username, email } = value;
+
+  let dreamer = null;
+
+  // LOGIN WITH USERNAME
+  if (username) {
+    dreamer = await Dreamer.findOne({ username: username });
+  } else if (email) {
+    dreamer = await Dreamer.findOne({ email: email });
+  }
+
+  if (!dreamer) return sendWrongCredentialsResponse(next);
+
+  const pwResult = await bcrypt.compare(password, dreamer.password);
+
+  if (!pwResult) return sendWrongCredentialsResponse(next);
+
+  const token = createJWT(dreamer.id, dreamer.permissionLevel);
+
+  setJWTHeader(res, token);
+
+  res
+    .status(200)
+    .json({ message: `You are now logged in as: ${dreamer.username}` });
+};
+
+export const logout = async (
+  req: express.Request,
+  res: express.Response,
+  next: (err?: ErrorWithStatus | Error) => void
+) => {
+  resetJWTHeader(res);
+  res.status(200).json({ message: 'You are now logged out.' });
+};
+
+export const edit = async (
+  req: express.Request,
+  res: express.Response,
+  next: (err?: ErrorWithStatus | Error) => void
+) => {};
 
 export const getAll = (
   req: express.Request,

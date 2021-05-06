@@ -5,6 +5,8 @@ import {
   getCookie,
   removeEmptyOrNull,
   createJWT,
+  setJWTHeader,
+  resetJWTHeader,
 } from './utils';
 import express from 'express';
 import jwt from 'jsonwebtoken';
@@ -37,29 +39,13 @@ export const noEndpointFoundHandler = (
   next(err);
 };
 
-export const corsHandler = (
-  req: express.Request,
-  res: express.Response,
-  next: (_?: any) => void
-) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', '*');
-
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Contorl-Allow-Methods', 'POST, GET, PUT, PATCH, DELETE');
-    return res.status(200).json({});
-  }
-
-  next();
-};
-
 export const jwtHandler = (
   req: express.Request,
   res: express.Response,
   next: () => void
 ) => {
   // GET THE JWT TOKEN FROM COOKIES OR NULL
-  const token = getCookie(JWTCOOKIENAME, req.headers.cookie);
+  const token = getCookie(JWTCOOKIENAME, req.cookies);
 
   // IF NO TOKEN EXISTS => GO TO NEXT STEP
   if (!token) return next();
@@ -67,14 +53,17 @@ export const jwtHandler = (
   // DECODES THE OLD TOKEN
   jwt.verify(token, JWTSECRET, (err, decoded) => {
     //IF TOKEN IS EXPIRED RETURN
-    if (err) return next();
-
+    if (err) {
+      resetJWTHeader(res);
+      console.log(err);
+      return next();
+    }
     console.log(decoded);
 
     // CREATES NEW REFRESHED TOKEN
     const newToken = createJWT(decoded['id'], decoded['permissionLevel']);
 
-    res.setHeader('Set-Cookie', `sessiontoken=${newToken}; HttpOnly`);
+    setJWTHeader(res, newToken);
 
     next();
   });
@@ -100,7 +89,7 @@ export const protectedRouteHandler = (
     errorHandler(err, req, res, next);
   };
 
-  const token = getCookie(JWTCOOKIENAME, req.headers.cookie);
+  const token = getCookie(JWTCOOKIENAME, req.cookies);
 
   if (!token) return sendNotSignedInError();
 

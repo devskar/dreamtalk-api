@@ -10,11 +10,15 @@ const router = express.Router();
 // USER SIGNUP
 router.post('/signup', controller.signup);
 
+router.post('/login', controller.login);
+
+router.post('/logout', protectedUserRouteHandler, controller.logout);
+
 router.get('/', controller.getAll);
 
-router.get('/:username', protectedUserRouteHandler, controller.getByUsername);
+router.get('/:username', controller.getByUsername);
 
-router.put('/:id', (req, res, next) => {});
+router.put('/:username', controller.edit);
 
 router.delete(
   '/:username',
