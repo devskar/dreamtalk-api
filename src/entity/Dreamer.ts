@@ -26,21 +26,19 @@ class Dreamer extends BaseEntity {
   @Column({ type: 'varchar', length: 15, unique: true })
   username: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true, select: false })
   email: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', select: false })
   password: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', select: false })
   permissionLevel: DreamerPermissionLevel;
 
   @CreateDateColumn()
   dateJoined: Date;
 
-  @OneToMany(() => Dream, (dream) => dream.author, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => Dream, (dream) => dream.author)
   dreams: Dream[];
 
   @BeforeInsert()

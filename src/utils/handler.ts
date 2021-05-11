@@ -1,3 +1,7 @@
+import {
+  sendNotSignedInErrorResponse,
+  sendInsufficientPermissionErrorResponse,
+} from './../static/responses';
 import { DreamerPermissionLevel } from './../entity/Dreamer';
 import { JWTCOOKIENAME, JWTSECRET } from './../static/const';
 import {
@@ -55,11 +59,8 @@ export const jwtHandler = (
     //IF TOKEN IS EXPIRED RETURN
     if (err) {
       resetJWTHeader(res);
-      console.log(err);
       return next();
     }
-    console.log(decoded);
-
     // CREATES NEW REFRESHED TOKEN
     const newToken = createJWT(decoded['id'], decoded['permissionLevel']);
 
@@ -69,35 +70,21 @@ export const jwtHandler = (
   });
 };
 
-export const protectedRouteHandler = (
+const protectedRouteHandler = (
   requiredPermissionLevel: DreamerPermissionLevel,
   req: express.Request,
   res: express.Response,
   next: () => void
 ) => {
-  const sendNotSignedInError = () => {
-    const err = new Error('You are not signed in.') as ErrorWithStatus;
-    err.status = 401;
-
-    errorHandler(err, req, res, next);
-  };
-
-  const sendInsufficientPermissionError = () => {
-    const err = new Error('Insufficient permission.') as ErrorWithStatus;
-    err.status = 401;
-
-    errorHandler(err, req, res, next);
-  };
-
   const token = getCookie(JWTCOOKIENAME, req.cookies);
 
-  if (!token) return sendNotSignedInError();
+  if (!token) return sendNotSignedInErrorResponse(next);
 
   jwt.verify(token, JWTSECRET, (err, decoded) => {
-    if (err) return sendNotSignedInError();
+    if (err) return sendNotSignedInErrorResponse(next);
 
     if (decoded['permissionLevel'] < requiredPermissionLevel)
-      return sendInsufficientPermissionError();
+      return sendInsufficientPermissionErrorResponse(next);
 
     next();
   });

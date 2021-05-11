@@ -14,7 +14,7 @@ class Dream extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Dreamer, (author) => author.dreams)
+  @ManyToOne(() => Dreamer, (author) => author.dreams, { onDelete: 'CASCADE' })
   author: Dreamer;
 
   @Column({ type: 'varchar', length: '75' })

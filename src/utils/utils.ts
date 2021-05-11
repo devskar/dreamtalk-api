@@ -1,9 +1,4 @@
-import {
-  JWTCOOKIENAME,
-  COOKIEPATH,
-  COOKIEDOMAINNAME,
-  JWTMAXTIMEMINUTES,
-} from './../static/const';
+import { JWTCOOKIENAME, JWTMAXTIMEMINUTES } from './../static/const';
 import { DreamerPermissionLevel } from './../entity/Dreamer';
 import { IncomingHttpHeaders } from 'node:http';
 import jwt from 'jsonwebtoken';
@@ -15,28 +10,6 @@ export interface ErrorWithStatus extends Error {
   status?: number;
   messages?: string[];
 }
-
-export const sendJoiErrorResponse = (
-  error: Joi.ValidationError,
-  next: (error: ErrorWithStatus) => void
-) => {
-  const messages = error.details.map((x) => x.message);
-
-  const err = new Error() as ErrorWithStatus;
-  err.status = 400;
-  err.messages = messages;
-
-  next(err);
-};
-
-export const sendWrongCredentialsResponse = (
-  next: (error: ErrorWithStatus) => void
-) => {
-  const err = new Error('Wrong login credentials.') as ErrorWithStatus;
-  err.status = 403;
-
-  next(err);
-};
 
 export const removeEmptyOrNull = (obj: any) => {
   Object.keys(obj).forEach(
@@ -85,4 +58,10 @@ export const resetJWTHeader = (res: express.Response) => {
     httpOnly: true,
   });
   console.log('[JWT] removed cookie');
+};
+
+export const getUserIdFromJWT = (token: string) => {
+  return jwt.verify(token, JWTSECRET, (err, decoded) =>
+    decoded ? decoded['id'] : null
+  );
 };

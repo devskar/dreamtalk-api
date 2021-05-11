@@ -1,20 +1,17 @@
-import {
-  sendWrongCredentialsResponse,
-  setJWTHeader,
-  resetJWTHeader,
-} from './../utils/utils';
+import { setJWTHeader, resetJWTHeader } from './../utils/utils';
 import bcrypt from 'bcryptjs';
 import {
   DREAMER_SIGNUP_SCHEMA,
   DREAMER_LOGIN_SCHEMA,
 } from './../static/schemas';
-import {
-  createJWT,
-  ErrorWithStatus,
-  sendJoiErrorResponse,
-} from '../utils/utils';
+import { createJWT, ErrorWithStatus } from '../utils/utils';
 import Dreamer from '../entity/Dreamer';
 import express from 'express';
+import {
+  sendJoiErrorResponse,
+  sendWrongCredentialsErrorResponse,
+} from '../static/responses';
+import Dream from '../entity/Dream';
 
 export const signup = async (
   req: express.Request,
@@ -93,16 +90,22 @@ export const login = async (
 
   // LOGIN WITH USERNAME
   if (username) {
-    dreamer = await Dreamer.findOne({ username: username });
+    dreamer = await Dreamer.createQueryBuilder('dreamer')
+      .where({ username: username })
+      .addSelect('dreamer.password')
+      .getOne();
   } else if (email) {
-    dreamer = await Dreamer.findOne({ email: email });
+    dreamer = await Dreamer.createQueryBuilder('dreamer')
+      .where({ email: email })
+      .addSelect('dreamer.password')
+      .getOne();
   }
 
-  if (!dreamer) return sendWrongCredentialsResponse(next);
+  if (!dreamer) return sendWrongCredentialsErrorResponse(next);
 
   const pwResult = await bcrypt.compare(password, dreamer.password);
 
-  if (!pwResult) return sendWrongCredentialsResponse(next);
+  if (!pwResult) return sendWrongCredentialsErrorResponse(next);
 
   const token = createJWT(dreamer.id, dreamer.permissionLevel);
 
@@ -143,10 +146,32 @@ export const getByUsername = async (
   res: express.Response,
   next: (err?: ErrorWithStatus | Error) => void
 ) => {
-  const dreamer = await Dreamer.findOne({ username: req.params.username });
+  const dreamer = await Dreamer.createQueryBuilder('dreamer')
+    .where({ username: req.params.username })
+    // .leftJoinAndSelect('dreamer.dreams', 'dreams') CANT USE THIS BECAUSE NO GOOD SOLUTION TO LIMIT THE AMOUNT OF DREAMS
+    .getOne();
 
   if (dreamer) {
     return res.status(202).json(dreamer);
+  } else {
+    res.status(404).json({ message: 'No user found.' });
+  }
+};
+
+export const getDreamsByUsername = async (
+  req: express.Request,
+  res: express.Response,
+  next: (err?: ErrorWithStatus | Error) => void
+) => {
+  const dreams = await Dream.createQueryBuilder('dream')
+    .leftJoinAndSelect('dream.author', 'author')
+    .where('author.username = :username', {
+      username: req.params.username,
+    })
+    .getMany();
+
+  if (dreams) {
+    return res.status(202).json(dreams);
   } else {
     res.status(404).json({ message: 'No user found.' });
   }

@@ -1,14 +1,11 @@
+import { protectedUserRouteHandler } from './../utils/handler';
 import Dream from './../entity/Dream';
 import * as controller from '../controller/dreams';
 import express from 'express';
 const router = express.Router();
 
-router.get('/', (req, res, next) => {
-  Dream.find().then((dreams) => {
-    res.status(200).json(dreams);
-  });
-});
+router.get('/', controller.get);
 
-router.post('/', (req, res, next) => {});
+router.post('/create', protectedUserRouteHandler, controller.create);
 
 export default router;

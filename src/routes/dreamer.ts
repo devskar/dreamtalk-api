@@ -18,11 +18,13 @@ router.get('/', controller.getAll);
 
 router.get('/:username', controller.getByUsername);
 
+router.get('/:username/dreams/', controller.getDreamsByUsername);
+
 router.put('/:username', controller.edit);
 
 router.delete(
   '/:username',
-  protectedStaffRouteHandler,
+  protectedUserRouteHandler,
   controller.deleteByUsername
 );
 

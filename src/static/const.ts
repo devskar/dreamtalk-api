@@ -13,5 +13,5 @@ export const JWTSECRET = 'BgJ133eBIXn8ocqh14T1xB8Vmt7nYZ2Uh8mndn06RBBhlamJmZ';
 export const JWTMAXTIME = '15m';
 export const JWTMAXTIMEMINUTES = 15;
 
-export const COOKIEDOMAINNAME = 'dreamtalk.abc';
-export const COOKIEPATH = '/';
+// DEFAULTS
+export const DREAM_AMOUNT_DEFAULT = 10;
