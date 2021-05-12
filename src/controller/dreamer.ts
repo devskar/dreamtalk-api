@@ -1,8 +1,21 @@
-import { setJWTHeader, resetJWTHeader } from './../utils/utils';
+import { DreamerPermissionLevel } from './../entity/Dreamer';
+import {
+  sendNotSignedInErrorResponse,
+  sendDreamerNotFoundErrorResponse,
+  sendInsufficientPermissionErrorResponse,
+  sendSomethingWentWrongErrorResponse,
+} from './../static/responses';
+import {
+  setJWTHeader,
+  resetJWTHeader,
+  getDreamerIdFromJWT,
+  getJWTToken,
+} from './../utils/utils';
 import bcrypt from 'bcryptjs';
 import {
   DREAMER_SIGNUP_SCHEMA,
   DREAMER_LOGIN_SCHEMA,
+  DREAMER_UPDATE_SCHEMA,
 } from './../static/schemas';
 import { createJWT, ErrorWithStatus } from '../utils/utils';
 import Dreamer from '../entity/Dreamer';
@@ -12,6 +25,7 @@ import {
   sendWrongCredentialsErrorResponse,
 } from '../static/responses';
 import Dream from '../entity/Dream';
+import Joi from 'joi';
 
 export const signup = async (
   req: express.Request,
@@ -125,11 +139,51 @@ export const logout = async (
   res.status(200).json({ message: 'You are now logged out.' });
 };
 
-export const edit = async (
+export const update = async (
   req: express.Request,
   res: express.Response,
   next: (err?: ErrorWithStatus | Error) => void
-) => {};
+) => {
+  const toBeEditedDreamer = await Dreamer.createQueryBuilder()
+    .where({ username: req.params.username })
+    .getOne();
+
+  // CHECK IF THE USER THAT SHOULD BE EDITED EXISTS
+  if (!toBeEditedDreamer) return sendDreamerNotFoundErrorResponse(next);
+
+  const executiveDreamer = await Dreamer.createQueryBuilder()
+    .where({ id: getDreamerIdFromJWT(getJWTToken(req)) })
+    .getOne();
+
+  // CHECK IF THE USER EXISTS (SHOULD NOT BE NECESSARY)
+  if (!executiveDreamer) return sendNotSignedInErrorResponse(next);
+
+  // CHECK IF THE USER IS ALLOWED TO EDIT THE USER
+  if (
+    !(executiveDreamer.id === toBeEditedDreamer.id) &&
+    !(executiveDreamer.permissionLevel >= DreamerPermissionLevel.Staff)
+  )
+    return sendInsufficientPermissionErrorResponse(next);
+
+  // VALIDATE THE INPUT
+  const { error, value } = DREAMER_UPDATE_SCHEMA.validate(req.body, {
+    abortEarly: false,
+  });
+
+  if (error) return sendJoiErrorResponse(error, next);
+
+  // UPDATING THE USER
+  const result = await Dreamer.createQueryBuilder()
+    .update(toBeEditedDreamer)
+    .set(value)
+    .execute();
+
+  // IF ERROR WHILE UPDATING OCCURS
+  if (!result.affected) return sendSomethingWentWrongErrorResponse(next);
+
+  // SEND RESPONSE IF EVERYTHING WENT RIGHT
+  res.status(200).json({ message: 'User successfully updated.' });
+};
 
 export const getAll = (
   req: express.Request,
@@ -182,11 +236,31 @@ export const deleteByUsername = async (
   res: express.Response,
   next: (err?: ErrorWithStatus | Error) => void
 ) => {
-  const result = await Dreamer.delete({ username: req.params.username });
+  const toBeDeletedDreamer = await Dreamer.createQueryBuilder()
+    .where({ username: req.params.username })
+    .getOne();
 
-  if (result.affected) {
-    return res.status(202).json({ message: 'User has been deleted.' });
-  } else {
-    return res.status(404).json({ message: 'No user found.' });
-  }
+  // CHECK IF THE USER THAT SHOULD BE DELETED EXISTS
+  if (!toBeDeletedDreamer) return sendDreamerNotFoundErrorResponse(next);
+
+  const executiveDreamer = await Dreamer.createQueryBuilder()
+    .where({ id: getDreamerIdFromJWT(getJWTToken(req)) })
+    .getOne();
+
+  // CHECK IF THE USER EXISTS (SHOULD NOT BE NECESSARY)
+  if (!executiveDreamer) return sendNotSignedInErrorResponse(next);
+
+  // CHECK IF THE USER IS ALLOWED TO DELETE THE USER
+  if (
+    !(executiveDreamer.id === toBeDeletedDreamer.id) &&
+    !(executiveDreamer.permissionLevel >= DreamerPermissionLevel.Staff)
+  )
+    return sendInsufficientPermissionErrorResponse(next);
+
+  // DELETE THE USER
+  toBeDeletedDreamer.remove().then((dreamer) => {
+    res
+      .status(200)
+      .json({ message: `Successfully deleted dreamer ${dreamer.username}` });
+  });
 };
