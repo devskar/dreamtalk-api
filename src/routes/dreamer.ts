@@ -20,7 +20,7 @@ router.get('/:username', controller.getByUsername);
 
 router.get('/:username/dreams/', controller.getDreamsByUsername);
 
-router.put('/:username', controller.edit);
+router.put('/:username', protectedUserRouteHandler, controller.edit);
 
 router.delete(
   '/:username',

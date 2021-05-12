@@ -2,7 +2,7 @@ import {
   sendNotSignedInErrorResponse,
   sendInsufficientPermissionErrorResponse,
 } from './../static/responses';
-import { DreamerPermissionLevel } from './../entity/Dreamer';
+import Dreamer, { DreamerPermissionLevel } from './../entity/Dreamer';
 import { JWTCOOKIENAME, JWTSECRET } from './../static/const';
 import {
   ErrorWithStatus,
@@ -11,6 +11,7 @@ import {
   createJWT,
   setJWTHeader,
   resetJWTHeader,
+  getJWTToken,
 } from './utils';
 import express from 'express';
 import jwt from 'jsonwebtoken';
@@ -70,24 +71,39 @@ export const jwtHandler = (
   });
 };
 
-const protectedRouteHandler = (
+const protectedRouteHandler = async (
   requiredPermissionLevel: DreamerPermissionLevel,
   req: express.Request,
   res: express.Response,
   next: () => void
 ) => {
-  const token = getCookie(JWTCOOKIENAME, req.cookies);
+  // GETTING THE TOKEN FRO COOKIES
+  const token = getJWTToken(req);
 
+  // IF IT DOES NOT EXIST => RETURN
   if (!token) return sendNotSignedInErrorResponse(next);
 
-  jwt.verify(token, JWTSECRET, (err, decoded) => {
-    if (err) return sendNotSignedInErrorResponse(next);
+  try {
+    // DECODING THE TOKEN
+    const decoded = jwt.verify(token, JWTSECRET);
 
-    if (decoded['permissionLevel'] < requiredPermissionLevel)
+    // GETTING THE DREAMER
+    const dreamer = await Dreamer.createQueryBuilder()
+      .where({ id: decoded['id'] })
+      .getOne();
+
+    // IF IT DOES NOT EXIST => RETURN
+    if (!dreamer) return sendNotSignedInErrorResponse(next);
+
+    // IF PERMISSION LEVEL IS TOO LOW TO ACCESS THIS ROUTE => RETURN
+    if (dreamer.permissionLevel < requiredPermissionLevel)
       return sendInsufficientPermissionErrorResponse(next);
 
     next();
-  });
+  } catch {
+    // IF DECODING FAILS => RETURN
+    return sendNotSignedInErrorResponse(next);
+  }
 };
 
 export const protectedUserRouteHandler = (
