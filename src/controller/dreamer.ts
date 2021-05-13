@@ -172,6 +172,28 @@ export const update = async (
 
   if (error) return sendJoiErrorResponse(error, next);
 
+  // CHECK IF USERNAME OR EMAIL IS ALREADY USED
+  const used = [];
+
+  if ('username' in value) {
+    if (await Dreamer.findOne({ username: value['username'] })) {
+      used.push('This username is already in use.');
+    }
+  }
+  if ('email' in value) {
+    if (await Dreamer.findOne({ email: value['email'] })) {
+      used.push('This email is already in use.');
+    }
+  }
+
+  if (used.length > 0) {
+    const err = new Error() as ErrorWithStatus;
+    err.status = 422;
+    err.messages = used;
+
+    return next(err);
+  }
+
   // UPDATING THE USER
   const result = await Dreamer.createQueryBuilder()
     .update(toBeEditedDreamer)
