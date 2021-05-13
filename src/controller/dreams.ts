@@ -146,3 +146,36 @@ export const edit = async (
   // SEND RESPONSE IF EVERYTHING WENT RIGHT
   res.status(200).json({ message: 'Dream successfully updated.', dream });
 };
+
+export const remove = async (
+  req: express.Request,
+  res: express.Response,
+  next: (err?: ErrorWithStatus | Error) => void
+) => {
+  const dreamer_id = getDreamerIdFromJWT(getJWTToken(req));
+
+  const dreamer = await Dreamer.createQueryBuilder()
+    .where({ id: dreamer_id })
+    .getOne();
+
+  if (!dreamer) return sendNotSignedInErrorResponse(next);
+
+  const dream_id = req.params.id;
+
+  const dream = await Dream.createQueryBuilder('dream')
+    .where({ id: dream_id })
+    .leftJoinAndSelect('dream.author', 'dreamer')
+    .getOne();
+
+  if (!dream) return sendDreamNotFoundErrorResponse(next);
+
+  if (
+    !(dream.author.id === dreamer.id) &&
+    !(dreamer.permissionLevel >= DreamerPermissionLevel.Staff)
+  )
+    return sendInsufficientPermissionErrorResponse(next);
+
+  dream.remove().then(() => {
+    res.status(200).json({ message: 'Successfully deleted dream.' });
+  });
+};
