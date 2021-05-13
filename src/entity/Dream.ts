@@ -5,17 +5,22 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import Comment from './Comment';
 
 @Entity('dreams')
 class Dream extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Dreamer, (author) => author.dreams, { onDelete: 'CASCADE' })
-  author: Dreamer;
+  @CreateDateColumn()
+  dateCreated: Date;
+
+  @UpdateDateColumn()
+  dateEdited: Date;
 
   @Column({ type: 'varchar', length: '75' })
   title: string;
@@ -23,11 +28,11 @@ class Dream extends BaseEntity {
   @Column({ type: 'varchar', length: '750' })
   content: string;
 
-  @CreateDateColumn()
-  dateCreated: Date;
+  @ManyToOne(() => Dreamer, (author) => author.dreams, { onDelete: 'CASCADE' })
+  author: Dreamer;
 
-  @UpdateDateColumn()
-  dateEdited: Date;
+  @OneToMany(() => Comment, (comment) => comment.dream)
+  comments: Comment[];
 }
 
 export default Dream;

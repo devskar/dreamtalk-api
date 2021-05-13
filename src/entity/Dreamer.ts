@@ -8,6 +8,7 @@ import {
   OneToMany,
   CreateDateColumn,
 } from 'typeorm';
+import Comment from './Comment';
 
 export enum DreamerPermissionLevel {
   User,
@@ -40,6 +41,9 @@ class Dreamer extends BaseEntity {
 
   @OneToMany(() => Dream, (dream) => dream.author)
   dreams: Dream[];
+
+  @OneToMany(() => Comment, (comment) => comment.author)
+  comments: Comment[];
 
   @BeforeInsert()
   addNickname() {
