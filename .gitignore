@@ -6,3 +6,4 @@ tmp/
 temp/
 TODO
 yarn.lock
+*.drawio

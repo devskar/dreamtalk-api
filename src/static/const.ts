@@ -15,11 +15,14 @@ export const DREAMER_NICKNAME_MIN_LENGTH = 5;
 export const DREAMER_NICKNAME_MAX_LENGTH = 15;
 export const DREAMER_PASSWORD_MIN_LENGTH = 5;
 export const DREAMER_PASSWORD_MAX_LENGTH = 25;
-// Dreams
+// Dream
 export const DREAM_TITLE_MIN_LENGTH = 5;
 export const DREAM_TITLE_MAX_LENGTH = 75;
 export const DREAM_CONTENT_MIN_LENGTH = 10;
 export const DREAM_CONTENT_MAX_LENGTH = 750;
+// Comment
+export const COMMENT_CONTENT_MIN_LENGTH = 1;
+export const COMMENT_CONTENT_MAX_LENGTH = 255;
 
 // JWT
 export const JWTCOOKIENAME = 'sessiontoken';
