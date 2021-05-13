@@ -41,10 +41,17 @@ export const sendWrongCredentialsErrorResponse = (
   next(err);
 };
 
-export const sendUserNotFoundErrorResponse = (
+export const sendDreamerNotFoundErrorResponse = (
   next: (error: ErrorWithStatus) => void
 ) => {
-  const err = new Error('User not found.') as ErrorWithStatus;
+  const err = new Error('Dreamer not found.') as ErrorWithStatus;
   err.status = 403;
+  next(err);
+};
+export const sendSomethingWentWrongErrorResponse = (
+  next: (error: ErrorWithStatus) => void
+) => {
+  const err = new Error('Something went wrong.') as ErrorWithStatus;
+  err.status = 500;
   next(err);
 };

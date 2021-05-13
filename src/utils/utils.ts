@@ -42,7 +42,7 @@ export const createJWT = (
   );
 };
 
-export const setJWTHeader = (res: express.Response, token: string) => {
+export const setJWTHeader = (res: express.Response, token: string): void => {
   const date = new Date();
   date.setTime(date.getTime() + JWTMAXTIMEMINUTES * 60 * 1000);
 
@@ -53,14 +53,18 @@ export const setJWTHeader = (res: express.Response, token: string) => {
   console.log('[JWT] added cookie');
 };
 
-export const resetJWTHeader = (res: express.Response) => {
+export const resetJWTHeader = (res: express.Response): void => {
   res.clearCookie(JWTCOOKIENAME, {
     httpOnly: true,
   });
   console.log('[JWT] removed cookie');
 };
 
-export const getUserIdFromJWT = (token: string) => {
+export const getJWTToken = (req: express.Request): string => {
+  return getCookie(JWTCOOKIENAME, req.cookies);
+};
+
+export const getDreamerIdFromJWT = (token: string) => {
   return jwt.verify(token, JWTSECRET, (err, decoded) =>
     decoded ? decoded['id'] : null
   );

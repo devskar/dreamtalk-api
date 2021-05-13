@@ -106,7 +106,7 @@ const protectedRouteHandler = async (
   }
 };
 
-export const protectedUserRouteHandler = (
+export const protectedDreamerRouteHandler = (
   req: express.Request,
   res: express.Response,
   next: () => void

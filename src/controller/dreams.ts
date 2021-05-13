@@ -1,13 +1,18 @@
 import { DREAM_AMOUNT_DEFAULT } from './../static/const';
 import { DREAM_CREATE_SCHEMA, GET_AMOUNT_SCHEMA } from './../static/schemas';
 import Dreamer from './../entity/Dreamer';
-import { ErrorWithStatus, getCookie, getUserIdFromJWT } from './../utils/utils';
+import {
+  ErrorWithStatus,
+  getCookie,
+  getJWTToken,
+  getDreamerIdFromJWT as getDreamerIdFromJWT,
+} from './../utils/utils';
 import express from 'express';
 import Dream from '../entity/Dream';
 import { JWTCOOKIENAME } from '../static/const';
 import {
   sendJoiErrorResponse,
-  sendUserNotFoundErrorResponse,
+  sendDreamerNotFoundErrorResponse as sendDreamerNotFoundErrorResponse,
 } from '../static/responses';
 import { RSA_NO_PADDING } from 'node:constants';
 import Joi from 'joi';
@@ -26,12 +31,10 @@ export const create = (
 
   const { title, content } = req.body;
 
-  const token = getCookie(JWTCOOKIENAME, req.cookies);
-
-  const author_id = getUserIdFromJWT(token);
+  const author_id = getDreamerIdFromJWT(getJWTToken(req));
 
   Dreamer.findOne({ where: { id: author_id } }).then((author) => {
-    if (!author) return sendUserNotFoundErrorResponse(next);
+    if (!author) return sendDreamerNotFoundErrorResponse(next);
 
     const dream = Dream.create({
       author: author,

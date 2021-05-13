@@ -1,7 +1,4 @@
-import {
-  protectedUserRouteHandler,
-  protectedStaffRouteHandler,
-} from './../utils/handler';
+import { protectedDreamerRouteHandler } from './../utils/handler';
 import express, { response } from 'express';
 import * as controller from '../controller/dreamer';
 
@@ -12,7 +9,7 @@ router.post('/signup', controller.signup);
 
 router.post('/login', controller.login);
 
-router.post('/logout', protectedUserRouteHandler, controller.logout);
+router.post('/logout', protectedDreamerRouteHandler, controller.logout);
 
 router.get('/', controller.getAll);
 
@@ -20,11 +17,11 @@ router.get('/:username', controller.getByUsername);
 
 router.get('/:username/dreams/', controller.getDreamsByUsername);
 
-router.put('/:username', protectedUserRouteHandler, controller.edit);
+router.put('/:username', protectedDreamerRouteHandler, controller.update);
 
 router.delete(
   '/:username',
-  protectedUserRouteHandler,
+  protectedDreamerRouteHandler,
   controller.deleteByUsername
 );
 
