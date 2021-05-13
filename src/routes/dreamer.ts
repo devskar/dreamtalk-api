@@ -4,7 +4,9 @@ import * as controller from '../controller/dreamer';
 
 const router = express.Router();
 
-// USER SIGNUP
+// FOR DEVELOPMENT INLY
+router.get('/me', controller.myself);
+
 router.post('/signup', controller.signup);
 
 router.post('/login', controller.login);

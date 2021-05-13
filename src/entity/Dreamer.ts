@@ -43,8 +43,7 @@ class Dreamer extends BaseEntity {
   email: string;
 
   @Column({
-    type: 'varchar',
-    length: DREAMER_PASSWORD_MAX_LENGTH,
+    type: 'text',
     select: false,
   })
   password: string;

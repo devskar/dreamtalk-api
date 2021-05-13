@@ -83,7 +83,8 @@ export const signup = async (
       });
     })
     .catch((err) => {
-      res.status(400).json({ message: 'Something went wrong.' });
+      console.log(err);
+      return sendSomethingWentWrongErrorResponse(next);
     });
 };
 
@@ -196,8 +197,9 @@ export const update = async (
 
   // UPDATING THE USER
   const result = await Dreamer.createQueryBuilder()
-    .update(toBeEditedDreamer)
+    .update()
     .set(value)
+    .where({ id: toBeEditedDreamer.id })
     .execute();
 
   // IF ERROR WHILE UPDATING OCCURS
@@ -285,4 +287,19 @@ export const deleteByUsername = async (
       .status(200)
       .json({ message: `Successfully deleted dreamer ${dreamer.username}` });
   });
+};
+
+// FOR DEVELOPMENT
+export const myself = async (
+  req: express.Request,
+  res: express.Response,
+  next: (err?: ErrorWithStatus | Error) => void
+) => {
+  const id = getDreamerIdFromJWT(getJWTToken(req));
+
+  const dreamer = await Dreamer.createQueryBuilder().where({ id: id }).getOne();
+
+  if (!dreamer) return res.status(404).json({ message: 'Not logged in' });
+
+  res.status(200).json(dreamer);
 };

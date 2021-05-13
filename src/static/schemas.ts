@@ -35,6 +35,7 @@ const dream_content = Joi.string()
   .max(DREAM_CONTENT_MAX_LENGTH);
 
 // SCHEMAS
+// Dreamer
 export const DREAMER_SIGNUP_SCHEMA = Joi.object({
   username: dreamer_username.required(),
   email: dreamer_email.required(),
@@ -47,11 +48,6 @@ export const DREAMER_LOGIN_SCHEMA = Joi.object({
   password: dreamer_password.required(),
 }).or('username', 'email');
 
-export const DREAM_CREATE_SCHEMA = Joi.object({
-  title: dream_title.required(),
-  content: dream_content.required(),
-});
-
 export const DREAMER_UPDATE_SCHEMA = Joi.object({
   username: dreamer_username,
   nickname: dreamer_nickname,
@@ -59,6 +55,18 @@ export const DREAMER_UPDATE_SCHEMA = Joi.object({
   password: dreamer_password,
 }).or('username', 'nickname', 'email', 'password');
 
+//Dream
+export const DREAM_CREATE_SCHEMA = Joi.object({
+  title: dream_title.required(),
+  content: dream_content.required(),
+});
+
+export const DREAM_UPDATE_SCHEMA = Joi.object({
+  title: dream_title,
+  content: dream_content,
+}).or('title', 'content');
+
+// UTIL
 export const GET_AMOUNT_SCHEMA = Joi.object({
   amount: Joi.string().regex(/^\d+$/),
 });

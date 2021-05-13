@@ -4,7 +4,11 @@ import * as controller from '../controller/dreams';
 import express from 'express';
 const router = express.Router();
 
-router.get('/', controller.get);
+router.get('/', controller.getAll);
+
+router.get('/:id', controller.getById);
+
+router.put('/:id', protectedDreamerRouteHandler, controller.edit);
 
 router.post('/create', protectedDreamerRouteHandler, controller.create);
 
