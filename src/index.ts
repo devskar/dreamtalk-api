@@ -1,4 +1,4 @@
-import { DEFAULT_ENPOINT } from './static/const';
+import { DEFAULT_ENPOINT as DEFAULT_ENDPOINT } from './static/const';
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import express from 'express';
@@ -17,7 +17,7 @@ createConnection()
 
     app.use(helmet());
 
-    app.use(DEFAULT_ENPOINT, router);
+    app.use(DEFAULT_ENDPOINT, router);
 
     // make sure to do nothing if the /api route isnt targeted
     app.use('', (req, res, next) => {

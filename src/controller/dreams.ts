@@ -43,7 +43,7 @@ export const create = async (
   // IF ANYTHING IS INVALID
   if (error) return sendJoiErrorResponse(error, next);
 
-  const { title, content } = req.body;
+  const { title, content } = value;
 
   const dream = Dream.create({
     author: dreamer,

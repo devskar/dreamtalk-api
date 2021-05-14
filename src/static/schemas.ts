@@ -10,6 +10,8 @@ import {
   DREAM_TITLE_MAX_LENGTH,
   DREAM_CONTENT_MIN_LENGTH,
   DREAM_CONTENT_MAX_LENGTH,
+  COMMENT_CONTENT_MIN_LENGTH,
+  COMMENT_CONTENT_MAX_LENGTH,
 } from './const';
 
 // RULES
@@ -33,6 +35,10 @@ const dream_title = Joi.string()
 const dream_content = Joi.string()
   .min(DREAM_CONTENT_MIN_LENGTH)
   .max(DREAM_CONTENT_MAX_LENGTH);
+
+const comment_content = Joi.string()
+  .min(COMMENT_CONTENT_MIN_LENGTH)
+  .max(COMMENT_CONTENT_MAX_LENGTH);
 
 // SCHEMAS
 // Dreamer
@@ -66,6 +72,10 @@ export const DREAM_UPDATE_SCHEMA = Joi.object({
   content: dream_content,
 }).or('title', 'content');
 
+// Comment
+export const COMMENT_POST_SCHEMA = Joi.object({
+  content: comment_content.required(),
+});
 // UTIL
 export const GET_AMOUNT_SCHEMA = Joi.object({
   amount: Joi.string().regex(/^\d+$/),
