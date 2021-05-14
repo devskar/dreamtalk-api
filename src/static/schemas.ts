@@ -76,7 +76,14 @@ export const DREAM_UPDATE_SCHEMA = Joi.object({
 export const COMMENT_POST_SCHEMA = Joi.object({
   content: comment_content.required(),
 });
+
 // UTIL
 export const GET_AMOUNT_SCHEMA = Joi.object({
   amount: Joi.string().regex(/^\d+$/),
+});
+
+export const GET_UUID_schema = Joi.object({
+  id: Joi.string().regex(
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  ),
 });

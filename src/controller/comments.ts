@@ -1,3 +1,4 @@
+import { GET_UUID_schema } from './../static/schemas';
 import {
   ErrorWithStatus,
   getDreamerIdFromJWT,
@@ -19,6 +20,10 @@ export const getDreamComments = async (
   res: express.Response,
   next: (err?: ErrorWithStatus | Error) => void
 ) => {
+  const validation = GET_UUID_schema.validate(req.params);
+
+  if (validation.error) return sendJoiErrorResponse(validation.error, next);
+
   const dream_id = req.params.id;
 
   const dream = await Dream.createQueryBuilder('dream')
@@ -70,4 +75,28 @@ export const postDreamComment = async (
   await comment.save();
 
   res.status(200).json({ message: 'Successfully added comment.', comment });
+};
+
+export const getAllComments = async (
+  req: express.Request,
+  res: express.Response,
+  next: (err?: ErrorWithStatus | Error) => void
+) => {
+  const comments = await Comment.createQueryBuilder().getMany();
+
+  res.status(200).json(comments);
+};
+
+export const getComment = async (
+  req: express.Request,
+  res: express.Response,
+  next: (err?: ErrorWithStatus | Error) => void
+) => {
+  const comment_id = req.params.id;
+
+  const comment = await Comment.createQueryBuilder()
+    .where({ id: comment_id })
+    .getOne();
+
+  res.status(200).json(comment);
 };

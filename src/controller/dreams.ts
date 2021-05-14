@@ -8,6 +8,7 @@ import {
   DREAM_CREATE_SCHEMA,
   DREAM_UPDATE_SCHEMA,
   GET_AMOUNT_SCHEMA,
+  GET_UUID_schema,
 } from './../static/schemas';
 import Dreamer, { DreamerPermissionLevel } from './../entity/Dreamer';
 import {
@@ -84,6 +85,10 @@ export const getById = async (
   res: express.Response,
   next: (err?: ErrorWithStatus | Error) => void
 ) => {
+  const { error, value } = GET_UUID_schema.validate(req.params);
+
+  if (error) return sendJoiErrorResponse(error, next);
+
   const id = req.params.id;
 
   const dream = await Dream.createQueryBuilder('dream')
@@ -101,6 +106,10 @@ export const edit = async (
   res: express.Response,
   next: (err?: ErrorWithStatus | Error) => void
 ) => {
+  const validation = GET_UUID_schema.validate(req.params);
+
+  if (validation.error) return sendJoiErrorResponse(validation.error, next);
+
   const dreamer_id = getDreamerIdFromJWT(getJWTToken(req));
 
   const dreamer = await Dreamer.createQueryBuilder()
@@ -152,6 +161,10 @@ export const remove = async (
   res: express.Response,
   next: (err?: ErrorWithStatus | Error) => void
 ) => {
+  const validation = GET_UUID_schema.validate(req.params);
+
+  if (validation.error) return sendJoiErrorResponse(validation.error, next);
+
   const dreamer_id = getDreamerIdFromJWT(getJWTToken(req));
 
   const dreamer = await Dreamer.createQueryBuilder()

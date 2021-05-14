@@ -2,6 +2,7 @@
 export const DEFAULT_ENPOINT = '/api';
 export const DREAMS_ENDPOINT = '/dreams';
 export const DREAMER_ENDPOINT = '/dreamer';
+export const COMMENTS_ENDPOINT = '/comments';
 
 // RATE LIMITING
 export const RATE_LIMIT_WINDOW = 60 * 60 * 1000;

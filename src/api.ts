@@ -1,9 +1,14 @@
-import { DREAMS_ENDPOINT, DREAMER_ENDPOINT } from './static/const';
+import {
+  DREAMS_ENDPOINT,
+  DREAMER_ENDPOINT,
+  COMMENTS_ENDPOINT,
+} from './static/const';
 import express from 'express';
-import dreamsRouter from './routes/dreams';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import dreamsRouter from './routes/dreams';
 import dreamerRouter from './routes/dreamer';
+import commentRouter from './routes/comments';
 import {
   errorHandler,
   noEndpointFoundHandler,
@@ -27,6 +32,7 @@ router.use(jwtHandler);
 // SETTING UP ROUTES
 router.use(DREAMS_ENDPOINT, dreamsRouter);
 router.use(DREAMER_ENDPOINT, dreamerRouter);
+router.use(COMMENTS_ENDPOINT, commentRouter);
 
 // Handles request if no route was found
 router.use(noEndpointFoundHandler);
