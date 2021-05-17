@@ -1,9 +1,8 @@
 import { JWTCOOKIENAME, JWTMAXTIMEMINUTES } from './../static/const';
-import { DreamerPermissionLevel } from './../entity/Dreamer';
+import Dreamer, { DreamerPermissionLevel } from './../entity/Dreamer';
 import { IncomingHttpHeaders } from 'node:http';
 import jwt from 'jsonwebtoken';
 import { JWTMAXTIME as JWTEXPIRETIME, JWTSECRET } from '../static/const';
-import Joi from 'joi';
 import express from 'express';
 
 export interface ErrorWithStatus extends Error {
@@ -64,8 +63,26 @@ export const getJWTToken = (req: express.Request): string => {
   return getCookie(JWTCOOKIENAME, req.cookies);
 };
 
-export const getDreamerIdFromJWT = (token: string) => {
-  return jwt.verify(token, JWTSECRET, (err, decoded) =>
-    decoded ? decoded['id'] : null
-  );
+export const getDreamerIdFromJWT = (token: string): string | null => {
+  try {
+    return jwt.verify(token, JWTSECRET)['id'];
+  } catch {
+    return null;
+  }
+};
+
+export const isDreamerOrHasPermission = (
+  requiredPermission: DreamerPermissionLevel,
+  executive_uuid: string,
+  target_uuid?: string
+): boolean => {
+  if (target_uuid) if (target_uuid === executive_uuid) return true;
+
+  Dreamer.createQueryBuilder()
+    .where({ id: executive_uuid })
+    .getOne()
+    .then((executiveDreamer) => {
+      // CHECK IF THE USER IS ALLOWED TO DELETE THE USER
+      return executiveDreamer.permissionLevel >= requiredPermission;
+    });
 };

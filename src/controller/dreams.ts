@@ -8,13 +8,15 @@ import {
   DREAM_CREATE_SCHEMA,
   DREAM_UPDATE_SCHEMA,
   GET_AMOUNT_SCHEMA,
-  GET_UUID_schema,
+  GET_UUID_SCHEMA,
 } from './../static/schemas';
 import Dreamer, { DreamerPermissionLevel } from './../entity/Dreamer';
 import {
   ErrorWithStatus,
   getJWTToken,
   getDreamerIdFromJWT as getDreamerIdFromJWT,
+  isDreamerOrHasPermission as dreamerHasPermissionOrIs,
+  isDreamerOrHasPermission,
 } from './../utils/utils';
 import express from 'express';
 import Dream from '../entity/Dream';
@@ -85,7 +87,7 @@ export const getById = async (
   res: express.Response,
   next: (err?: ErrorWithStatus | Error) => void
 ) => {
-  const { error, value } = GET_UUID_schema.validate(req.params);
+  const { error, value } = GET_UUID_SCHEMA.validate(req.params);
 
   if (error) return sendJoiErrorResponse(error, next);
 
@@ -106,7 +108,7 @@ export const edit = async (
   res: express.Response,
   next: (err?: ErrorWithStatus | Error) => void
 ) => {
-  const validation = GET_UUID_schema.validate(req.params);
+  const validation = GET_UUID_SCHEMA.validate(req.params);
 
   if (validation.error) return sendJoiErrorResponse(validation.error, next);
 
@@ -128,8 +130,10 @@ export const edit = async (
   if (!dream) return sendDreamNotFoundErrorResponse(next);
 
   if (
-    !(dream.author.id === dreamer.id) &&
-    !(dreamer.permissionLevel >= DreamerPermissionLevel.Staff)
+    !dreamerHasPermissionOrIs(
+      DreamerPermissionLevel.Staff,
+      getDreamerIdFromJWT(getJWTToken(req))
+    )
   )
     return sendInsufficientPermissionErrorResponse(next);
 
@@ -153,7 +157,7 @@ export const edit = async (
   if (!result.affected) return sendSomethingWentWrongErrorResponse(next);
 
   // SEND RESPONSE IF EVERYTHING WENT RIGHT
-  res.status(200).json({ message: 'Dream successfully updated.', dream });
+  res.status(200).json({ message: 'Dream successfully updated.' });
 };
 
 export const remove = async (
@@ -161,7 +165,7 @@ export const remove = async (
   res: express.Response,
   next: (err?: ErrorWithStatus | Error) => void
 ) => {
-  const validation = GET_UUID_schema.validate(req.params);
+  const validation = GET_UUID_SCHEMA.validate(req.params);
 
   if (validation.error) return sendJoiErrorResponse(validation.error, next);
 
@@ -183,10 +187,13 @@ export const remove = async (
   if (!dream) return sendDreamNotFoundErrorResponse(next);
 
   if (
-    !(dream.author.id === dreamer.id) &&
-    !(dreamer.permissionLevel >= DreamerPermissionLevel.Staff)
+    !isDreamerOrHasPermission(
+      DreamerPermissionLevel.Staff,
+      dreamer.id,
+      dream.author.id
+    )
   )
-    return sendInsufficientPermissionErrorResponse(next);
+    return sendDreamNotFoundErrorResponse(next);
 
   dream.remove().then(() => {
     res.status(200).json({ message: 'Successfully deleted dream.' });

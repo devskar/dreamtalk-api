@@ -17,7 +17,11 @@ import {
   DREAMER_LOGIN_SCHEMA,
   DREAMER_UPDATE_SCHEMA,
 } from './../static/schemas';
-import { createJWT, ErrorWithStatus } from '../utils/utils';
+import {
+  createJWT,
+  ErrorWithStatus,
+  isDreamerOrHasPermission,
+} from '../utils/utils';
 import Dreamer from '../entity/Dreamer';
 import express from 'express';
 import {
@@ -25,7 +29,6 @@ import {
   sendWrongCredentialsErrorResponse,
 } from '../static/responses';
 import Dream from '../entity/Dream';
-import Joi from 'joi';
 
 export const signup = async (
   req: express.Request,
@@ -152,17 +155,12 @@ export const update = async (
   // CHECK IF THE USER THAT SHOULD BE EDITED EXISTS
   if (!toBeEditedDreamer) return sendDreamerNotFoundErrorResponse(next);
 
-  const executiveDreamer = await Dreamer.createQueryBuilder()
-    .where({ id: getDreamerIdFromJWT(getJWTToken(req)) })
-    .getOne();
-
-  // CHECK IF THE USER EXISTS (SHOULD NOT BE NECESSARY)
-  if (!executiveDreamer) return sendNotSignedInErrorResponse(next);
-
-  // CHECK IF THE USER IS ALLOWED TO EDIT THE USER
   if (
-    !(executiveDreamer.id === toBeEditedDreamer.id) &&
-    !(executiveDreamer.permissionLevel >= DreamerPermissionLevel.Staff)
+    !isDreamerOrHasPermission(
+      DreamerPermissionLevel.Staff,
+      getDreamerIdFromJWT(getJWTToken(req)),
+      toBeEditedDreamer.id
+    )
   )
     return sendInsufficientPermissionErrorResponse(next);
 
@@ -267,17 +265,12 @@ export const deleteByUsername = async (
   // CHECK IF THE USER THAT SHOULD BE DELETED EXISTS
   if (!toBeDeletedDreamer) return sendDreamerNotFoundErrorResponse(next);
 
-  const executiveDreamer = await Dreamer.createQueryBuilder()
-    .where({ id: getDreamerIdFromJWT(getJWTToken(req)) })
-    .getOne();
-
-  // CHECK IF THE USER EXISTS (SHOULD NOT BE NECESSARY)
-  if (!executiveDreamer) return sendNotSignedInErrorResponse(next);
-
-  // CHECK IF THE USER IS ALLOWED TO DELETE THE USER
   if (
-    !(executiveDreamer.id === toBeDeletedDreamer.id) &&
-    !(executiveDreamer.permissionLevel >= DreamerPermissionLevel.Staff)
+    !isDreamerOrHasPermission(
+      DreamerPermissionLevel.Staff,
+      getDreamerIdFromJWT(getJWTToken(req)),
+      toBeDeletedDreamer.id
+    )
   )
     return sendInsufficientPermissionErrorResponse(next);
 
