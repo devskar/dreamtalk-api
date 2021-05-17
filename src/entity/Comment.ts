@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { COMMENT_CONTENT_MAX_LENGTH } from '../static/const';
-import ChildComment from './ChildComment';
+import Reply from './Reply';
 import Dream from './Dream';
 import Dreamer from './Dreamer';
 
@@ -39,8 +39,8 @@ class Comment extends BaseEntity {
   })
   dream: Dream;
 
-  @OneToMany(() => ChildComment, (childComment) => childComment.parent)
-  children: ChildComment[];
+  @OneToMany(() => Reply, (reply) => reply.parent)
+  replies: Reply[];
 }
 
 export default Comment;

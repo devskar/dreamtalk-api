@@ -110,8 +110,6 @@ export const getComment = async (
 
   if (!comment) return sendCommentNotFoundErrorResponse(next);
 
-  console.log(comment);
-
   res.status(200).json(comment);
 };
 

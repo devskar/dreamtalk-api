@@ -1,4 +1,4 @@
-import { COMMENT_CONTENT_MAX_LENGTH } from './../static/const';
+import { COMMENT_CONTENT_MAX_LENGTH } from '../static/const';
 import {
   BaseEntity,
   Column,
@@ -10,7 +10,7 @@ import {
 import Comment from './Comment';
 import Dreamer from './Dreamer';
 
-@Entity('childcomments')
+@Entity('replies')
 class ChildComment extends BaseEntity {
   // AUTO GENERATED COLUMNS
   @PrimaryGeneratedColumn('uuid')
@@ -27,12 +27,12 @@ class ChildComment extends BaseEntity {
   content: string;
 
   // RELATIONS
-  @ManyToOne(() => Comment, (comment) => comment.children, {
+  @ManyToOne(() => Comment, (comment) => comment.replies, {
     onDelete: 'CASCADE',
   })
   parent: Comment;
 
-  @ManyToOne(() => Dreamer, (author) => author.childComments, {
+  @ManyToOne(() => Dreamer, (author) => author.replies, {
     onDelete: 'CASCADE',
   })
   author: Dreamer;
