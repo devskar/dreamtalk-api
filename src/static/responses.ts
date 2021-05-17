@@ -57,6 +57,14 @@ export const sendDreamNotFoundErrorResponse = (
   next(err);
 };
 
+export const sendReplyNotFoundErrorResponse = (
+  next: (error: ErrorWithStatus) => void
+) => {
+  const err = new Error('Reply not found.') as ErrorWithStatus;
+  err.status = 403;
+  next(err);
+};
+
 export const sendCommentNotFoundErrorResponse = (
   next: (error: ErrorWithStatus) => void
 ) => {

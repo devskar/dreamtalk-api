@@ -11,7 +11,7 @@ import Comment from './Comment';
 import Dreamer from './Dreamer';
 
 @Entity('replies')
-class ChildComment extends BaseEntity {
+class Reply extends BaseEntity {
   // AUTO GENERATED COLUMNS
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -38,4 +38,4 @@ class ChildComment extends BaseEntity {
   author: Dreamer;
 }
 
-export default ChildComment;
+export default Reply;

@@ -205,7 +205,7 @@ export const deleteComment = async (
   )
     return sendInsufficientPermissionErrorResponse(next);
 
-  // DELETE THE USER
+  // DELETE THE COMMENT
   comment.remove().then(() => {
     res.status(200).json({ message: `Successfully deleted comment.` });
   });
