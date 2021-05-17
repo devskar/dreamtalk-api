@@ -12,6 +12,8 @@ import {
   DREAM_CONTENT_MAX_LENGTH,
   COMMENT_CONTENT_MIN_LENGTH,
   COMMENT_CONTENT_MAX_LENGTH,
+  REPLY_CONTENT_MIN_LENGTH,
+  REPLY_CONTENT_MAX_LENGTH,
 } from './const';
 
 // RULES
@@ -39,6 +41,10 @@ const dream_content = Joi.string()
 const comment_content = Joi.string()
   .min(COMMENT_CONTENT_MIN_LENGTH)
   .max(COMMENT_CONTENT_MAX_LENGTH);
+
+const reply_content = Joi.string()
+  .min(REPLY_CONTENT_MIN_LENGTH)
+  .max(REPLY_CONTENT_MAX_LENGTH);
 
 // SCHEMAS
 // Dreamer
@@ -78,6 +84,14 @@ export const COMMENT_POST_SCHEMA = Joi.object({
 });
 export const COMMENT_UPDATE_SCHEMA = Joi.object({
   content: comment_content.required(),
+});
+
+// Reply
+export const REPLY_POST_SCHEMA = Joi.object({
+  content: reply_content.required(),
+});
+export const REPLY_UPDATE_SCHEMA = Joi.object({
+  content: reply_content.required(),
 });
 
 // UTIL
