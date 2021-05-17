@@ -16,7 +16,7 @@ router.delete('/:id', protectedDreamerRouteHandler, controller.deleteComment);
 router.get('/:id/replies', replyController.getCommentReplies);
 
 router.post(
-  '/:id/comments',
+  '/:id/replies',
   protectedDreamerRouteHandler,
   replyController.postCommentReply
 );
