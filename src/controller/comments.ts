@@ -78,7 +78,9 @@ export const postDreamComment = async (
 
   await comment.save();
 
-  res.status(200).json({ message: 'Successfully added comment.', comment });
+  res
+    .status(200)
+    .json({ message: 'Successfully added comment.', id: comment.id });
 };
 
 export const getAllComments = async (

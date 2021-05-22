@@ -85,7 +85,7 @@ export const postCommentReply = async (
 
   await reply.save();
 
-  res.status(200).json({ message: 'Successfully added reply.', reply });
+  res.status(200).json({ message: 'Successfully added reply.', id: reply.id });
 };
 
 export const getAllReplies = async (
@@ -95,6 +95,8 @@ export const getAllReplies = async (
 ) => {
   const replies = await Reply.createQueryBuilder('reply')
     .leftJoinAndSelect('reply.parent', 'comment')
+    .leftJoinAndSelect('reply.author', 'dreamer')
+    .leftJoinAndSelect('comment.dream', 'dream')
     .getMany();
 
   res.status(200).json(replies);
@@ -113,6 +115,7 @@ export const getReply = async (
     .where({ id: req.params.id })
     .leftJoinAndSelect('reply.author', 'dreamer')
     .leftJoinAndSelect('reply.parent', 'comment')
+    .leftJoinAndSelect('comment.dream', 'dream')
     .getOne();
 
   if (!reply) return sendReplyNotFoundErrorResponse(next);
