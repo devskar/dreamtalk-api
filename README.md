@@ -154,5 +154,14 @@ DreamtalkAPI is working with 4 basic entities:
 | \*\*PUT /comments/`id`        | updates the specified comment                 |
 | \*\*DELETE /comments/`id`     | deletes the specified comment                 |
 
+### Reply endpoints
+
+| Endpoint               | Function                             |
+| ---------------------- | ------------------------------------ |
+| GET /replies           | gets all existing replies            |
+| GET /replies/`id`      | gets the reply with the specified id |
+| \*\*PUT /reply/`id`    | updates the specified reply          |
+| \*\*DELETE /reply/`id` | deletes the specified reply          |
+
 \* -> Route is only accessible to logged in users.
 \*\* -> Route is only accessible for the specific author/user or an account with staff role.
