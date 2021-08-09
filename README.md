@@ -4,7 +4,7 @@ Simple twitter-like backend API.
 
 ## DEPENDENCIES
 
-It was build with
+build with:
 
 - TypeScript
 - TypeORM
